@@ -197,13 +197,13 @@ class Captcha
             // 中文验证码
             for ($i = 0; $i < $this->length; $i++) {
                 $code[$i] = iconv_substr($this->zhSet, floor(mt_rand(0, mb_strlen($this->zhSet, 'utf-8') - 1)), 1, 'utf-8');
-                imagettftext($this->im, $this->fontSize, mt_rand(-40, 40), (int) ($this->fontSize * ($i + 1) * 1.5), $this->fontSize + mt_rand(10, 20), $this->color, $this->fontttf, $code[$i]);
+                imagettftext($this->im, $this->fontSize, mt_rand(-40, 40), intval($this->fontSize * ($i + 1) * 1.5), $this->fontSize + mt_rand(10, 20), $this->color, $this->fontttf, $code[$i]);
             }
         } else {
             for ($i = 0; $i < $this->length; $i++) {
                 $code[$i] = $this->codeSet[mt_rand(0, strlen($this->codeSet) - 1)];
-                $codeNX += mt_rand((int)($this->fontSize * 1.2), (int)($this->fontSize * 1.6));
-                imagettftext($this->im, $this->fontSize, mt_rand(-40, 40), $codeNX, (int)($this->fontSize * 1.6), $this->color, $this->fontttf, $code[$i]);
+                $codeNX += mt_rand(intval($this->fontSize * 1.2), intval($this->fontSize * 1.6));
+                imagettftext($this->im, $this->fontSize, mt_rand(-40, 40), $codeNX, intval($this->fontSize * 1.6), $this->color, $this->fontttf, $code[$i]);
             }
         }
 
@@ -241,18 +241,19 @@ class Captcha
         $px = $py = 0;
 
         // 曲线前部分
-        $A = mt_rand(1, (int) ($this->imageH / 2)); // 振幅
-        $b = mt_rand((int) (-$this->imageH / 4), (int)  ($this->imageH / 4)); // Y轴方向偏移量
-        $f = mt_rand((int) (-$this->imageH / 4), (int)  ($this->imageH / 4)); // X轴方向偏移量
+        $A = mt_rand(1, intval($this->imageH / 2)); // 振幅
+        $qh = intval($this->imageH / 4);
+        $b = mt_rand(-$qh, $qh); // Y轴方向偏移量
+        $f = mt_rand(-$qh, $qh); // X轴方向偏移量
         $T = mt_rand($this->imageH, $this->imageW * 2); // 周期
-        $w = (int)((2 * M_PI) / $T);
+        $w = (2 * M_PI) / $T;
 
         $px1 = 0; // 曲线横坐标起始位置
-        $px2 = mt_rand((int)($this->imageW / 2), (int)($this->imageW * 0.8)); // 曲线横坐标结束位置
+        $px2 = mt_rand(intval($this->imageW / 2), intval($this->imageW * 0.8)); // 曲线横坐标结束位置
 
         for ($px = $px1; $px <= $px2; $px = $px + 1) {
             if (0 != $w) {
-                $py = (int) ($A * sin($w * $px + $f)) + $b + (int)($this->imageH / 2); // y = Asin(ωx+φ) + b
+                $py = intval($A * sin($w * $px + $f) + $b + $this->imageH / 2); // y = Asin(ωx+φ) + b
                 $i  = (int) ($this->fontSize / 5);
                 while ($i > 0) {
                     imagesetpixel($this->im, $px + $i, $py + $i, $this->color); // 这里(while)循环画像素点比imagettftext和imagestring用字体大小一次画出（不用这while循环）性能要好很多
@@ -262,17 +263,17 @@ class Captcha
         }
 
         // 曲线后部分
-        $A   = mt_rand(1, (int)($this->imageH / 2)); // 振幅
-        $f   = mt_rand((int)(-$this->imageH / 4), (int) ($this->imageH / 4)); // X轴方向偏移量
+        $A   = mt_rand(1, intval($this->imageH / 2)); // 振幅
+        $f   = mt_rand(-intval($this->imageH / 4), intval($this->imageH / 4)); // X轴方向偏移量
         $T   = mt_rand($this->imageH, $this->imageW * 2); // 周期
-        $w   = (int)((2 * M_PI) / $T);
-        $b   = $py - $A * sin($w * $px + $f) - (int) ($this->imageH / 2);
+        $w   = (2 * M_PI) / $T;
+        $b   = $py - $A * sin($w * $px + $f) - $this->imageH / 2;
         $px1 = $px2;
         $px2 = $this->imageW;
 
         for ($px = $px1; $px <= $px2; $px = $px + 1) {
             if (0 != $w) {
-                $py =  $A * sin($w * $px + $f) + $b + (int)($this->imageH / 2); // y = Asin(ωx+φ) + b
+                $py = intval($A * sin($w * $px + $f) + $b + $this->imageH / 2); // y = Asin(ωx+φ) + b
                 $i  = (int) ($this->fontSize / 5);
                 while ($i > 0) {
                     imagesetpixel($this->im, $px + $i, $py + $i, $this->color);
